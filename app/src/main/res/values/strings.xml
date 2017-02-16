@@ -1,0 +1,56 @@
+<resources>
+    <string name="app_name">Stock Hawk</string>
+
+    <string name="pref_stocks_initialized_key" translatable="false">initialized</string>
+
+    <string name="pref_stocks_key">stocks</string>
+
+
+    <string name="pref_display_mode_key">displayMode</string>
+    <string name="pref_display_mode_default">@string/pref_display_mode_percentage_key</string>
+
+    <string name="pref_display_mode_absolute_key">absolute</string>
+    <string name="pref_display_mode_percentage_key">percentage</string>
+
+    <string name="default_stocks_yahoo">YHOO</string>
+    <string name="default_stocks_apple">AAPL</string>
+    <string name="default_stocks_microsoft">MSFT</string>
+    <string name="default_stocks_facebook">FB</string>
+
+
+    <string name="action_change_units">@string/pref_display_mode_key</string>
+
+
+    <string name="dialog_title">Add Stock</string>
+    <string name="dialog_hint">Symbol (e.g. GOOG)</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_add">Add</string>
+
+    <string name="error_no_network">No network connectivity! Will load stock cursor when the network is available.</string>
+    <string name="error_no_stocks">No stocks added! Hit the floating action button to add one.</string>
+
+    <string name="toast_stock_added_no_connectivity">Symbol %s added. Will refresh when network available.</string>
+    <string name="toast_no_connectivity">Will refresh when network available.</string>
+
+    <!-- detail activity chart -->
+    <!-- temp x axis labels: to be replaced by formatted string below -->
+    <string name="label_jan">Jan</string>
+    <string name="label_feb">Feb</string>
+    <string name="label_mar">Mar</string>
+    <string name="label_apr">Apr</string>
+    <string name="label_may">May</string>
+    <string name="label_jun">Jun</string>
+
+    <string name="format_x_axis_label"></string>
+
+    <!-- temp y axis labels: to be replaced by formatted string below -->
+    <string name="label_zero">0</string>
+    <string name="label_50">50</string>
+    <string name="label_100">100</string>
+    <string name="label_150">150</string>
+    <string name="label_200">200</string>
+    <string name="label_250">250</string>
+
+    <string name="format_y_axis_label"></string>
+
+</resources>
