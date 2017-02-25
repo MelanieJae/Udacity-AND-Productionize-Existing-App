@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -14,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +28,8 @@ import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
 import com.udacity.stockhawk.sync.QuoteSyncJob;
 
+import java.util.Calendar;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
@@ -34,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         StockAdapter.StockAdapterOnClickHandler {
 
     private static final int STOCK_LOADER = 0;
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.recycler_view)
     RecyclerView stockRecyclerView;
@@ -43,13 +49,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.error)
     TextView error;
+    @BindView(R.id.clock)
+    TextView clock;
     private StockAdapter adapter;
 
     @Override
     public void onClick(String symbol) {
         Timber.d("Symbol clicked: %s", symbol);
+        Uri stockUri = Contract.Quote.makeUriForStock(symbol);
+        Timber.d("stockUri" + stockUri.toString());
+
         // launch intent to send user to stock detail page
-        Intent launchDetail = new Intent(this, StockDetailActivity.class);
+        Intent launchDetail = new Intent(this, DetailActivity.class);
+        launchDetail.setData(stockUri);
         startActivity(launchDetail);
     }
 
@@ -84,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 getContentResolver().delete(Contract.Quote.makeUriForStock(symbol), null, null);
             }
         }).attachToRecyclerView(stockRecyclerView);
-
 
     }
 
@@ -151,6 +162,32 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             error.setVisibility(View.GONE);
         }
         adapter.setCursor(data);
+
+        // market close countdown timer
+        Calendar c = Calendar.getInstance();
+        int seconds = c.get(Calendar.SECOND);
+        Log.v(LOG_TAG, "seconds= " + seconds);
+        long currentTimeInMillis = seconds*1000;
+        long marketClose = 16*60*60*1000;
+        long millisInFuture = marketClose - currentTimeInMillis;
+        new CountDownTimer(millisInFuture, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                long hoursWithRemainder = millisUntilFinished/(60*60*1000);
+                long hours = (long)Math.floor(hoursWithRemainder);
+                long hourRemainder = hoursWithRemainder - hours;
+                long minutesWithRemainder = hourRemainder/(60*1000);
+                long minutes = (long)Math.floor(hoursWithRemainder);
+                long minutesRemainder = minutesWithRemainder - minutes;
+                long seconds = (long)Math.ceil(minutesRemainder/1000);
+                clock.setText("Closing Bell: " + hours + ":" + minutes + ":" + seconds);
+            }
+
+            public void onFinish() {
+                clock.setText("The US Markets are now closed.");
+            }
+        }.start();
+
     }
 
 

@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.StockDetailActivity"/>
+        <activity android:name=".ui.DetailActivity"/>
 
         <service
             android:name=".sync.QuoteIntentService"
