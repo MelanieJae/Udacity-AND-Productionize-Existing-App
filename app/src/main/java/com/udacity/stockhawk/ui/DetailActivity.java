@@ -94,14 +94,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         // parse raw data string, read date (x) and adjusted close price (y) values from string
         String[] dataPoints = rawDataString.split("\\n");
-        for (int i = dataPoints.length - 1; i > 0; i--) {
+        for (int i = 0; i < dataPoints.length; i++) {
             String[] dataPointSubArray = dataPoints[i].split(",");
             Timber.d("dataPointSubArray size= " + dataPointSubArray.length);
 
-            xAxis.add("1");
-            xAxis.add("2");
-            xAxis.add("3");
-            xAxis.add("4");
+            xAxis.add(dataPointSubArray[0]);
             float dateFloat = Float.parseFloat(dataPointSubArray[0]);
             Timber.d("dateFloatString= " + dateFloat);
 
