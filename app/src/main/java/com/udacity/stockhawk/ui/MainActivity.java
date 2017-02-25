@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @BindView(R.id.clock)
     TextView clock;
     private StockAdapter adapter;
+    Calendar rightNow;
 
     @Override
     public void onClick(String symbol) {
@@ -96,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 getContentResolver().delete(Contract.Quote.makeUriForStock(symbol), null, null);
             }
         }).attachToRecyclerView(stockRecyclerView);
+
+        setCountdownClockText();
 
     }
 
@@ -161,33 +164,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (data.getCount() != 0) {
             error.setVisibility(View.GONE);
         }
+        // populate stock list
         adapter.setCursor(data);
 
-        // market close countdown timer
-        Calendar c = Calendar.getInstance();
-        int seconds = c.get(Calendar.SECOND);
-        Log.v(LOG_TAG, "seconds= " + seconds);
-        long currentTimeInMillis = seconds*1000;
-        long marketClose = 16*60*60*1000;
-        long millisInFuture = marketClose - currentTimeInMillis;
-        new CountDownTimer(millisInFuture, 1000) {
-
-            public void onTick(long millisUntilFinished) {
-                long hoursWithRemainder = millisUntilFinished/(60*60*1000);
-                long hours = (long)Math.floor(hoursWithRemainder);
-                long hourRemainder = hoursWithRemainder - hours;
-                long minutesWithRemainder = hourRemainder/(60*1000);
-                long minutes = (long)Math.floor(hoursWithRemainder);
-                long minutesRemainder = minutesWithRemainder - minutes;
-                long seconds = (long)Math.ceil(minutesRemainder/1000);
-                clock.setText("Closing Bell: " + hours + ":" + minutes + ":" + seconds);
-            }
-
-            public void onFinish() {
-                clock.setText("The US Markets are now closed.");
-            }
-        }.start();
-
+        // display countdown clock text (i.e. clock or "market is closed message")
     }
 
 
@@ -226,5 +206,53 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setCountdownClockText() {
+        // the 'right now' calendar instance
+        rightNow = Calendar.getInstance();
+        Log.v("day of week", "" + rightNow.get(Calendar.DAY_OF_WEEK));
+        switch (rightNow.get(Calendar.DAY_OF_WEEK)) {
+            case Calendar.SATURDAY:
+                clock.setText(getString(R.string.us_markets_closed));
+            case Calendar.SUNDAY:
+                clock.setText(getString(R.string.us_markets_closed));
+            default:
+                displayCountdownTimer();
+        }
+    }
+
+    private void displayCountdownTimer() {
+        final int currTimeHours = rightNow.get(Calendar.HOUR);
+        final int currTimeMinutes = rightNow.get(Calendar.MINUTE);
+        final int currTimeSeconds = rightNow.get(Calendar.SECOND);
+        final long currentTimeInMillis = ((currTimeHours * 60 * 60) + (currTimeMinutes * 60)
+                + currTimeSeconds)*1000;
+        int GMTOffset = rightNow.get(Calendar.ZONE_OFFSET);
+
+        // adjusted US market close based on 4PM EST(US) (9PM/21:00 GMT) converted to the user's
+        // time zone obtained from the system settings via the calendar 'rightnow' instance c
+        long adjUSMarketClose = (21 + GMTOffset) * 60*60*1000;
+
+        final long millisInFuture = adjUSMarketClose - currentTimeInMillis;
+        new CountDownTimer(millisInFuture, 1000) {
+            public void onTick(long millisUntilFinished) {
+                // convert millisInFuture to standard hhh:mm:ss format
+                int hours = (int)Math.ceil(millisUntilFinished / (1000*60*60));
+                double hourFract = hours - Math.floor(hours);
+                int minutes = (int)Math.ceil(hourFract * 60);
+                double minutesFract = minutes - Math.floor(minutes);
+                int seconds = (int)Math.ceil(minutesFract * 60);
+                clock.setText
+                        (getString(R.string.closing_bell_countdown) + hours
+                                + ":" + minutes
+                                + ":" + seconds);
+            }
+
+            public void onFinish() {
+                clock.setText(getString(R.string.us_markets_closed));
+            }
+        }.start();
+
     }
 }

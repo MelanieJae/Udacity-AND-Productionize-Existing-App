@@ -32,6 +32,14 @@
     <string name="toast_stock_added_no_connectivity">Symbol %s added. Will refresh when network available.</string>
     <string name="toast_no_connectivity">Will refresh when network available.</string>
 
+    <!-- main activity countdown timer -->
+    <string name="closing_bell_countdown">U.S. Closing bell in: </string>
+    <string name="us_markets_closed">The U.S. Markets are now closed.</string>
+    <!--&lt;!&ndash; formatted strings for countdown clock &ndash;&gt;-->
+    <!--<string name="cd_hours" translatable="false">%1d</string>-->
+    <!--<string name="cd_minutes" translatable="false">%2d</string>-->
+    <!--<string name="cd_seconds" translatable="false">%3d</string>-->
+
     <!-- detail activity chart -->
     <!-- temp x axis labels: to be replaced by formatted string below -->
     <string name="label_jan">Jan</string>

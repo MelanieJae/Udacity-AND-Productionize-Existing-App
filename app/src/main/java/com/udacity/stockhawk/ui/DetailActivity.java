@@ -141,7 +141,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         // bind data to chart
         lineChart.setData(new LineData(dataSets));
         lineChart.getDescription().setPosition(700f, 40f);
-        lineChart.getDescription().setTextSize(32f);
+        lineChart.getDescription().setTextSize(28f);
         lineChart.getDescription().setText("Price History for: " + stockSymbol);
         lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         lineChart.invalidate();
