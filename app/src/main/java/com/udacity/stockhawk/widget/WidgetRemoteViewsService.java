@@ -2,10 +2,13 @@ package com.udacity.stockhawk.widget;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.os.Binder;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.udacity.stockhawk.R;
+import com.udacity.stockhawk.data.Contract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,20 +23,24 @@ public class WidgetRemoteViewsService extends RemoteViewsService {
 
     List<String> mCollection = new ArrayList<>();
     Context mContext = null;
+    private Cursor data = null;
 
     @Override
-    public RemoteViewsFactory onGetViewFactory(Intent intent) {
+    public RemoteViewsFactory onGetViewFactory(final Intent intent) {
         Timber.d("onGetViewFactory called");
         return new RemoteViewsFactory() {
             @Override
             public void onCreate() {
-                initData();
-                Timber.d("mCollection= " + mCollection.toString());
+            //
             }
 
             @Override
             public void onDataSetChanged() {
-                initData();
+                final long identityToken = Binder.clearCallingIdentity();
+                data = getContentResolver().query(Contract.Quote.URI,
+                        Contract.Quote.QUOTE_COLUMNS.toArray(new String[]{}),
+                        null, null, Contract.Quote.COLUMN_SYMBOL);
+                Binder.restoreCallingIdentity(identityToken);
             }
 
             @Override
@@ -42,20 +49,20 @@ public class WidgetRemoteViewsService extends RemoteViewsService {
 
             @Override
             public int getCount() {
-                return mCollection.size();
+                return data.getCount();
             }
 
             @Override
             public RemoteViews getViewAt(int position) {
                 RemoteViews view = new RemoteViews(mContext.getPackageName(),
                         R.layout.widget_list_item);
-                view.setTextViewText(R.id.stock_symbol,mCollection.get(position));
+                view.setTextViewText(R.id.stock_symbol,data.getString(Contract.Quote.POSITION_SYMBOL));
                 return view;
             }
 
             @Override
             public RemoteViews getLoadingView() {
-                return null;
+                return new RemoteViews(getPackageName(), R.layout.widget_list_item);
             }
 
             @Override
@@ -65,6 +72,8 @@ public class WidgetRemoteViewsService extends RemoteViewsService {
 
             @Override
             public long getItemId(int position) {
+                if (data.moveToPosition(position))
+                    return data.getLong(Contract.Quote.POSITION_ID);
                 return position;
             }
 
@@ -73,14 +82,9 @@ public class WidgetRemoteViewsService extends RemoteViewsService {
                 return true;
             }
 
-            private void initData() {
-                mCollection.clear();
-                for (int i = 1; i <= 10; i++) {
-                    mCollection.add("ListView item " + i);
-                }
-            }
         };
     }
+
 }
 
 
