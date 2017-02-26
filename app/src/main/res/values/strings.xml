@@ -41,6 +41,7 @@
     <!--<string name="cd_seconds" translatable="false">%3d</string>-->
 
     <!-- detail activity chart -->
+    <string name="chart_description">Price History for: %s</string>
     <!-- temp x axis labels: to be replaced by formatted string below -->
     <string name="label_jan">Jan</string>
     <string name="label_feb">Feb</string>

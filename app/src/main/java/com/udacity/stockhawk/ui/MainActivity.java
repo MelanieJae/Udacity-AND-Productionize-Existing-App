@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void setCountdownClockText() {
         // the 'right now' calendar instance
         rightNow = Calendar.getInstance();
-        Log.v("day of week", "" + rightNow.get(Calendar.DAY_OF_WEEK));
+        Log.v(LOG_TAG, "dayOfWeek=" + rightNow.get(Calendar.DAY_OF_WEEK));
         switch (rightNow.get(Calendar.DAY_OF_WEEK)) {
             case Calendar.SATURDAY:
                 clock.setText(getString(R.string.us_markets_closed));

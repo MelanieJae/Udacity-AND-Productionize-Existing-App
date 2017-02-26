@@ -40,16 +40,16 @@ public final class PrefUtils {
         String key = context.getString(R.string.pref_stocks_key);
         Set<String> stocks = getStocks(context);
 
-        if (add) {
-            stocks.add(symbol);
-        } else {
-            stocks.remove(symbol);
-        }
+            if (add) {
+                stocks.add(symbol);
+            } else {
+                stocks.remove(symbol);
+            }
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putStringSet(key, stocks);
-        editor.apply();
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putStringSet(key, stocks);
+            editor.apply();
     }
 
     public static void addStock(Context context, String symbol) {

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -53,6 +54,8 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         // the Utils class for MPAndroid chart must be initialized before attempting
         // to render the chart
         Utils.init(this);
+        TextView chartHeading = (TextView)findViewById(R.id.chart_heading);
+        chartHeading.setText(String.format(getString(R.string.chart_description), stockSymbol));
 
         // initialize loader
         getLoaderManager().initLoader(CHART_DATA_LOADER_ID, null, this);
@@ -140,9 +143,9 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         // bind data to chart
         lineChart.setData(new LineData(dataSets));
-        lineChart.getDescription().setPosition(700f, 40f);
+        lineChart.getDescription().setText("");
+        lineChart.getDescription().setPosition(800f, 80f);
         lineChart.getDescription().setTextSize(28f);
-        lineChart.getDescription().setText("Price History for: " + stockSymbol);
         lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         lineChart.invalidate();
     }

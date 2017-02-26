@@ -24,5 +24,9 @@
     <string name="us_markets_closed">
     الولايات المتحدة. أغلقت أسواق
     الأسهم الآن
+
+        <!-- detail activity -->
+        <string name="chart_description"><ns1:g>%s</ns1:g>التاريخ السعر</string>
+
 </string>
 </resources>

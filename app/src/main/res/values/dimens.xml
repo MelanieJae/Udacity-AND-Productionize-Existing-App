@@ -7,3 +7,4 @@
     <dimen name="widget_detail_min_resize_width">220dp</dimen>
     <dimen name="widget_detail_default_width">250dp</dimen>
 </resources>
+

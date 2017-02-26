@@ -73,10 +73,6 @@ public final class QuoteSyncJob {
                 Stock stock = quotes.get(symbol);
                 StockQuote quote = stock.getQuote();
 
-                // handle invalid stock symbol inputs; route user back to add dialog
-                if (stock == null || quote == null) {
-
-                }
                 float price = quote.getPrice().floatValue();
                 float change = quote.getChange().floatValue();
                 float percentChange = quote.getChangeInPercent().floatValue();
@@ -166,9 +162,7 @@ public final class QuoteSyncJob {
 
             scheduler.schedule(builder.build());
 
-
         }
     }
-
 
 }
