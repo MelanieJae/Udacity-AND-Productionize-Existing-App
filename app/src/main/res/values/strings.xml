@@ -12,11 +12,13 @@
     <string name="pref_display_mode_absolute_key">absolute</string>
     <string name="pref_display_mode_percentage_key">percentage</string>
 
+    <!-- stock adapter -->
     <string name="default_stocks_yahoo">YHOO</string>
     <string name="default_stocks_apple">AAPL</string>
     <string name="default_stocks_microsoft">MSFT</string>
     <string name="default_stocks_facebook">FB</string>
-
+    <string name="dollar_pos_prefix">+$</string>
+    <string name="euro_pos_prefix">+&#8364;</string>
 
     <string name="action_change_units">@string/pref_display_mode_key</string>
 
@@ -33,12 +35,12 @@
     <string name="toast_no_connectivity">Will refresh when network available.</string>
 
     <!-- main activity countdown timer -->
-    <string name="closing_bell_countdown">U.S. Closing bell in: </string>
+    <string name="closing_bell_countdown">U.S. Closing bell in:&#160;&#160;</string>
     <string name="us_markets_closed">The U.S. Markets are now closed.</string>
     <!--&lt;!&ndash; formatted strings for countdown clock &ndash;&gt;-->
-    <!--<string name="cd_hours" translatable="false">%1d</string>-->
-    <!--<string name="cd_minutes" translatable="false">%2d</string>-->
-    <!--<string name="cd_seconds" translatable="false">%3d</string>-->
+    <string name="format_hours" translatable="false">%02d</string>
+    <string name="format_minutes" translatable="false">%02d</string>
+    <string name="format_seconds" translatable="false">%02d</string>
 
     <!-- detail activity chart -->
     <string name="chart_description">Price History for: %s</string>
@@ -51,14 +53,6 @@
     <string name="label_jun">Jun</string>
 
     <string name="format_x_axis_label"></string>
-
-    <!-- temp y axis labels: to be replaced by formatted string below -->
-    <string name="label_zero">0</string>
-    <string name="label_50">50</string>
-    <string name="label_100">100</string>
-    <string name="label_150">150</string>
-    <string name="label_200">200</string>
-    <string name="label_250">250</string>
 
     <string name="format_y_axis_label"></string>
 

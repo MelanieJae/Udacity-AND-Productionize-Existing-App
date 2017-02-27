@@ -13,18 +13,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 
 import timber.log.Timber;
+
+import static com.udacity.stockhawk.R.id.chart;
 
 /**
  * Created by melanieh on 2/18/17.
@@ -41,13 +48,14 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     Uri stockContentUri;
     ArrayList<String> xAxis = new ArrayList<>();
     ArrayList<Entry> yAxis = new ArrayList<>();
+    final HashMap<Integer, String> dateLabelMap = new HashMap<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         Timber.d("onCreate called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        lineChart = (LineChart) findViewById(R.id.chart);
+        lineChart = (LineChart) findViewById(chart);
         stockContentUri = getIntent().getData();
         stockSymbol = Contract.Quote.getStockFromUri(stockContentUri);
         Timber.d("stock symbol=" + stockSymbol);
@@ -59,6 +67,12 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         // initialize loader
         getLoaderManager().initLoader(CHART_DATA_LOADER_ID, null, this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getLoaderManager().restartLoader(CHART_DATA_LOADER_ID, null, this);
     }
 
     @Override
@@ -81,7 +95,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         while (cursor.moveToNext()) {
             historyDataString = cursor.getString(cursor.getColumnIndexOrThrow(Contract.Quote.COLUMN_HISTORY));
         }
-        parseHistoryString(historyDataString, stockSymbol);
+        renderChart(historyDataString);
     }
 
     @Override
@@ -89,48 +103,56 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         getLoaderManager().restartLoader(CHART_DATA_LOADER_ID, null, this);
     }
 
-    private void parseHistoryString(String rawDataString, String stockSymbol) {
-
-        Timber.d("renderChart called");
-        Timber.d("rawDataString= " + rawDataString);
-        Timber.d("symbol= " + stockSymbol);
-
+    private void renderChart(String rawDataString) {
         // parse raw data string, read date (x) and adjusted close price (y) values from string
         String[] dataPoints = rawDataString.split("\\n");
         for (int i = dataPoints.length - 1; i > 0; i--) {
             String[] dataPointSubArray = dataPoints[i].split(",");
             Timber.d("dataPointSubArray size= " + dataPointSubArray.length);
 
-            xAxis.add("1");
-            xAxis.add("2");
-            xAxis.add("3");
-            xAxis.add("4");
-            float dateFloat = Float.parseFloat(dataPointSubArray[0]);
-            Timber.d("dateFloatString= " + dateFloat);
+            long dateInMillis = Long.parseLong(dataPointSubArray[0]);
+            Timber.d("dateInMillis= " + dateInMillis);
 
-            float date = dateFloat / 1.0e12f;
-            Timber.d("float date=" + date);
+            dateLabelMap.put(dataPoints.length - i, dataPointSubArray[0]);
+            Timber.d("dataPoints.length - i = " + (dataPoints.length - 1));
+
+            float dateFloat = dateInMillis / 1.0e12f;
+            Timber.d("float date=" + dateFloat);
 
             float adjClosePrice = Float.parseFloat(dataPointSubArray[1]);
             Timber.d("float adjClosePrice=" + adjClosePrice);
 
             // add new data point to array list of custom data objects(Entries)
-            Entry entry = new Entry(date, adjClosePrice);
+            Entry entry = new Entry(dateFloat, adjClosePrice);
             Timber.d("entry= " + entry);
             yAxis.add(entry);
         }
 
-        renderChart(yAxis);
-    }
-
-    private void renderChart(ArrayList<Entry> yAxis) {
-        LineDataSet set;
-
+        // create new data set object for chart and add to the array of datasets
+        // (in this case just one for the stock we clicked on)
+        LineDataSet set = new LineDataSet(yAxis, stockSymbol);
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         // create a dataset and give it a type
-        set = new LineDataSet(yAxis, stockSymbol);
+
 
         dataSets.add(set); // add the datasets
+
+        // format xaxis labels
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setValueFormatter(new IAxisValueFormatter() {
+
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+
+                String dateMillisString = dateLabelMap.get((int)value);
+                long dateInMillis = Long.parseLong(dateMillisString);
+                Date date = new Date(dateInMillis);
+                String dateString = DateFormat.getDateInstance().format(date);
+
+                return dateString;
+            }
+
+        });
 
         // chart settings
         set.setColor(Color.BLACK);

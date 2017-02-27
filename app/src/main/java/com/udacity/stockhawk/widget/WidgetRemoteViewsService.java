@@ -1,6 +1,5 @@
 package com.udacity.stockhawk.widget;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Binder;
@@ -9,9 +8,13 @@ import android.widget.RemoteViewsService;
 
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
+import com.udacity.stockhawk.data.PrefUtils;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import timber.log.Timber;
 
@@ -22,7 +25,6 @@ import timber.log.Timber;
 public class WidgetRemoteViewsService extends RemoteViewsService {
 
     List<String> mCollection = new ArrayList<>();
-    Context mContext = null;
     private Cursor data = null;
 
     @Override
@@ -54,11 +56,54 @@ public class WidgetRemoteViewsService extends RemoteViewsService {
 
             @Override
             public RemoteViews getViewAt(int position) {
-                RemoteViews view = new RemoteViews(mContext.getPackageName(),
+                Timber.d("getViewAt called");
+
+                data.moveToPosition(position);
+                RemoteViews views = new RemoteViews(getApplicationContext().getPackageName(),
                         R.layout.widget_list_item);
-                view.setTextViewText(R.id.stock_symbol,data.getString(Contract.Quote.POSITION_SYMBOL));
-                return view;
-            }
+
+                DecimalFormat dollarFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
+                DecimalFormat dollarFormatWithPlus = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
+                dollarFormatWithPlus.setPositivePrefix(getApplicationContext().getString(R.string.dollar_pos_prefix));
+                DecimalFormat euroFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.getDefault());
+                DecimalFormat euroFormatWithPlus = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.getDefault());
+                euroFormatWithPlus.setPositivePrefix(getApplicationContext().getString(R.string.euro_pos_prefix));
+                DecimalFormat percentageFormat = (DecimalFormat) NumberFormat.getPercentInstance(Locale.getDefault());
+                percentageFormat.setMaximumFractionDigits(2);
+                percentageFormat.setMinimumFractionDigits(2);
+                percentageFormat.setPositivePrefix("+");
+                String symbol = data.getString(Contract.Quote.POSITION_SYMBOL);
+                Timber.d("symbol= " + symbol);
+                views.setTextViewText(R.id.symbol, data.getString(Contract.Quote.POSITION_SYMBOL));
+
+                if (Locale.getDefault() == Locale.US || Locale.getDefault() == Locale.CANADA) {
+                    views.setTextViewText(R.id.price,
+                            dollarFormat.format(data.getFloat(Contract.Quote.POSITION_PRICE)));
+                } else {
+                    views.setTextViewText(R.id.price,
+                            euroFormat.format(data.getFloat(Contract.Quote.POSITION_PRICE)));
+                }
+//
+                float rawAbsoluteChange = data.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
+                float percentageChange = data.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
+
+//                    if (rawAbsoluteChange > 0) {
+//                        views.setImageViewResource(R.id.change, R.drawable.percent_change_pill_green);
+//                    } else {
+//                        views.setImageViewResource(R.id.change, R.drawable.percent_change_pill_red);
+//                    }
+
+                String change = dollarFormatWithPlus.format(rawAbsoluteChange);
+                String percentage = percentageFormat.format(percentageChange / 100);
+
+                if (PrefUtils.getDisplayMode(getApplicationContext())
+                        .equals(getApplicationContext().getString(R.string.pref_display_mode_absolute_key))) {
+                    views.setTextViewText(R.id.change, change);
+                } else {
+                    views.setTextViewText(R.id.change, percentage);
+                }
+            return views;
+        }
 
             @Override
             public RemoteViews getLoadingView() {

@@ -8,6 +8,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -16,7 +17,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +29,7 @@ import com.udacity.stockhawk.data.PrefUtils;
 import com.udacity.stockhawk.sync.QuoteSyncJob;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         StockAdapter.StockAdapterOnClickHandler {
 
     private static final int STOCK_LOADER = 0;
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.recycler_view)
     RecyclerView stockRecyclerView;
@@ -53,12 +53,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     TextView clock;
     private StockAdapter adapter;
     Calendar rightNow;
+    Handler mHandler;
+    int hours;
+    int minutes;
+    int seconds;
+    long millisInFuture = 0;
 
     @Override
     public void onClick(String symbol) {
         Timber.d("Symbol clicked: %s", symbol);
         Uri stockUri = Contract.Quote.makeUriForStock(symbol);
-        Timber.d("stockUri" + stockUri.toString());
 
         // launch intent to send user to stock detail page
         Intent launchDetail = new Intent(this, DetailActivity.class);
@@ -69,10 +73,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Timber.d("defaultLocale= " + Locale.getDefault());
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        // display stocks
         adapter = new StockAdapter(this, this);
         stockRecyclerView.setAdapter(adapter);
         stockRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -86,7 +91,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
             @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                                  RecyclerView.ViewHolder target) {
                 return false;
             }
 
@@ -98,8 +104,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         }).attachToRecyclerView(stockRecyclerView);
 
+        // display dynamic market closing bell countdown timer
         setCountdownClockText();
-
     }
 
     private boolean networkUp() {
@@ -136,14 +142,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     void addStock(String symbol) {
         if (symbol != null && !symbol.isEmpty()) {
-
             if (networkUp()) {
                 swipeRefreshLayout.setRefreshing(true);
             } else {
                 String message = getString(R.string.toast_stock_added_no_connectivity, symbol);
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
-
             PrefUtils.addStock(this, symbol);
             QuoteSyncJob.syncImmediately(this);
         }
@@ -160,14 +164,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         swipeRefreshLayout.setRefreshing(false);
-
         if (data.getCount() != 0) {
             error.setVisibility(View.GONE);
         }
         // populate stock list
         adapter.setCursor(data);
-
-        // display countdown clock text (i.e. clock or "market is closed message")
     }
 
 
@@ -198,7 +199,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_change_units) {
             PrefUtils.toggleDisplayMode(this);
             setDisplayModeMenuItemIcon(item);
@@ -209,9 +209,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void setCountdownClockText() {
-        // the 'right now' calendar instance
         rightNow = Calendar.getInstance();
-        Log.v(LOG_TAG, "dayOfWeek=" + rightNow.get(Calendar.DAY_OF_WEEK));
         switch (rightNow.get(Calendar.DAY_OF_WEEK)) {
             case Calendar.SATURDAY:
                 clock.setText(getString(R.string.us_markets_closed));
@@ -232,27 +230,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // adjusted US market close based on 4PM EST(US) (9PM/21:00 GMT) converted to the user's
         // time zone obtained from the system settings via the calendar 'rightnow' instance c
-        long adjUSMarketClose = (21 + GMTOffset) * 60*60*1000;
+        long adjUSMarketClose = (21*3600*1000 + GMTOffset);
 
-        final long millisInFuture = adjUSMarketClose - currentTimeInMillis;
+        millisInFuture = adjUSMarketClose - currentTimeInMillis;
         new CountDownTimer(millisInFuture, 1000) {
             public void onTick(long millisUntilFinished) {
                 // convert millisInFuture to standard hhh:mm:ss format
-                int hours = (int)Math.ceil(millisUntilFinished / (1000*60*60));
-                double hourFract = hours - Math.floor(hours);
-                int minutes = (int)Math.ceil(hourFract * 60);
-                double minutesFract = minutes - Math.floor(minutes);
-                int seconds = (int)Math.ceil(minutesFract * 60);
-                clock.setText
-                        (getString(R.string.closing_bell_countdown) + hours
-                                + ":" + minutes
-                                + ":" + seconds);
+                int[] time = PrefUtils.convertTimeInMillisToTime(millisUntilFinished);
+                hours = time[0];
+                minutes = time[1];
+                seconds = time[2];
+                clock.setText(getString(R.string.closing_bell_countdown)
+                        + String.format(getString(R.string.format_hours), hours)
+                        + ":" + String.format(getString(R.string.format_minutes), minutes)
+                        + ":" + String.format(getString(R.string.format_seconds), seconds));
             }
-
             public void onFinish() {
                 clock.setText(getString(R.string.us_markets_closed));
             }
+
         }.start();
 
     }
+
 }

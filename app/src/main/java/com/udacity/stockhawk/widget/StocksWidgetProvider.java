@@ -40,7 +40,14 @@ public class StocksWidgetProvider extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_list);
-//        views.setTextViewText(R.id.text, "test");
+        // Set up the collection
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            setRemoteAdapter(context, views);
+        } else {
+            setRemoteAdapterV11(context, views);
+        }
+        // Instruct the widget manager to update the widget
+        appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 
     @Override
@@ -59,5 +66,17 @@ public class StocksWidgetProvider extends AppWidgetProvider {
         views.setRemoteAdapter(R.id.listview,
                 new Intent(context, WidgetRemoteViewsService.class));
     }
+
+    /**
+     * Sets the remote adapter used to fill in the list items
+     *
+     * @param views RemoteViews to set the RemoteAdapter
+     */
+    @SuppressWarnings("deprecation")
+    private static void setRemoteAdapterV11(Context context, @NonNull final RemoteViews views) {
+        views.setRemoteAdapter(0, R.id.listview,
+                new Intent(context, WidgetRemoteViewsService.class));
+    }
+
 
 }

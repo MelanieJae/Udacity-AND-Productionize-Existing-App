@@ -87,4 +87,14 @@ public final class PrefUtils {
         editor.apply();
     }
 
+    public static int[] convertTimeInMillisToTime(long timeInMillis) {
+        int[] time = new int[3];
+        time[0] = (int)Math.ceil(timeInMillis/(1000*3600)); // hours
+        double hourFract = time[0] - Math.floor(time[0]);
+        time[1] = (int)Math.ceil(hourFract * 60);
+        double minutesFract = time[1] - Math.floor(time[1]);
+        time[2] = (int)Math.ceil(minutesFract * 60);
+        return time;
+    }
+
 }

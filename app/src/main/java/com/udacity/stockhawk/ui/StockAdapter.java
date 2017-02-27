@@ -25,6 +25,8 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
     private final Context context;
     private final DecimalFormat dollarFormatWithPlus;
     private final DecimalFormat dollarFormat;
+    private final DecimalFormat euroFormatWithPlus;
+    private final DecimalFormat euroFormat;
     private final DecimalFormat percentageFormat;
     private Cursor cursor;
     private final StockAdapterOnClickHandler clickHandler;
@@ -35,7 +37,10 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
 
         dollarFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
         dollarFormatWithPlus = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
-        dollarFormatWithPlus.setPositivePrefix("+$");
+        dollarFormatWithPlus.setPositivePrefix(context.getString(R.string.dollar_pos_prefix));
+        euroFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.getDefault());
+        euroFormatWithPlus = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.getDefault());
+        euroFormatWithPlus.setPositivePrefix(context.getString(R.string.euro_pos_prefix));
         percentageFormat = (DecimalFormat) NumberFormat.getPercentInstance(Locale.getDefault());
         percentageFormat.setMaximumFractionDigits(2);
         percentageFormat.setMinimumFractionDigits(2);
@@ -66,30 +71,51 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
 
         cursor.moveToPosition(position);
 
+        if(Locale.getDefault() == Locale.US || Locale.getDefault() == Locale.CANADA) {
+            holder.symbol.setText(cursor.getString(Contract.Quote.POSITION_SYMBOL));
+            holder.price.setText(dollarFormat.format(cursor.getFloat(Contract.Quote.POSITION_PRICE)));
 
-        holder.symbol.setText(cursor.getString(Contract.Quote.POSITION_SYMBOL));
-        holder.price.setText(dollarFormat.format(cursor.getFloat(Contract.Quote.POSITION_PRICE)));
+            float rawAbsoluteChange = cursor.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
+            float percentageChange = cursor.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
 
+            if (rawAbsoluteChange > 0) {
+                holder.change.setBackgroundResource(R.drawable.percent_change_pill_green);
+            } else {
+                holder.change.setBackgroundResource(R.drawable.percent_change_pill_red);
+            }
 
-        float rawAbsoluteChange = cursor.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
-        float percentageChange = cursor.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
+            String change = dollarFormatWithPlus.format(rawAbsoluteChange);
+            String percentage = percentageFormat.format(percentageChange / 100);
 
-        if (rawAbsoluteChange > 0) {
-            holder.change.setBackgroundResource(R.drawable.percent_change_pill_green);
+            if (PrefUtils.getDisplayMode(context)
+                    .equals(context.getString(R.string.pref_display_mode_absolute_key))) {
+                holder.change.setText(change);
+            } else {
+                holder.change.setText(percentage);
+            }
         } else {
-            holder.change.setBackgroundResource(R.drawable.percent_change_pill_red);
+            holder.symbol.setText(cursor.getString(Contract.Quote.POSITION_SYMBOL));
+            holder.price.setText(euroFormat.format(cursor.getFloat(Contract.Quote.POSITION_PRICE)));
+
+            float rawAbsoluteChange = cursor.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
+            float percentageChange = cursor.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
+
+            if (rawAbsoluteChange > 0) {
+                holder.change.setBackgroundResource(R.drawable.percent_change_pill_green);
+            } else {
+                holder.change.setBackgroundResource(R.drawable.percent_change_pill_red);
+            }
+
+            String change = euroFormatWithPlus.format(rawAbsoluteChange);
+            String percentage = percentageFormat.format(percentageChange / 100);
+
+            if (PrefUtils.getDisplayMode(context)
+                    .equals(context.getString(R.string.pref_display_mode_absolute_key))) {
+                holder.change.setText(change);
+            } else {
+                holder.change.setText(percentage);
+            }
         }
-
-        String change = dollarFormatWithPlus.format(rawAbsoluteChange);
-        String percentage = percentageFormat.format(percentageChange / 100);
-
-        if (PrefUtils.getDisplayMode(context)
-                .equals(context.getString(R.string.pref_display_mode_absolute_key))) {
-            holder.change.setText(change);
-        } else {
-            holder.change.setText(percentage);
-        }
-
 
     }
 

@@ -16,7 +16,7 @@
     <string name="pref_stocks_key">مخازن</string>
     <string name="toast_no_connectivity">سيتم تحديث عندما الشبكة المتوفرة</string>
     <string name="toast_stock_added_no_connectivity">وأضاف رمز
-        <ns1:g>%s</ns1:g> سيتم تحديث عندما الشبكة المتوفرة</string>
+       %s سيتم تحديث عندما الشبكة المتوفرة</string>
 
     <string name="closing_bell_countdown">
 الولايات المتحدة. يبدو إغلاق جرس في
