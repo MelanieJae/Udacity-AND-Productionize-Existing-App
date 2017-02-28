@@ -1,4 +1,4 @@
-# The intent of this project is to incorporate fictional UX feedback from users to improve accessibility features and eliminate bugs. This project has as its base an existing Gradle Android Studio project that can be found here:
+The intent of this project is to incorporate fictional UX feedback from users to improve accessibility features and eliminate bugs. This project has as its base an existing Gradle Android Studio project that can be found here:
 
 https://www.udacity.com/course/android-developer-nanodegree-by-google--nd801).
 
