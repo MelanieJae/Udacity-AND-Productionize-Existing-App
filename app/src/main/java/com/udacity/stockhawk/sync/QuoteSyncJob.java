@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import timber.log.Timber;
@@ -69,40 +70,36 @@ public final class QuoteSyncJob {
 
             ArrayList<ContentValues> quoteCVs = new ArrayList<>();
 
-            while (iterator.hasNext()) {
-                String symbol = iterator.next();
-                Stock stock = quotes.get(symbol);
-                StockQuote quote = stock.getQuote();
+//            while (iterator.hasNext()) {
+            String symbol = iterator.next();
+            Stock stock = quotes.get(symbol);
+            StockQuote quote = stock.getQuote();
+            float price = quote.getPrice().floatValue();
+            float change = quote.getChange().floatValue();
+            float percentChange = quote.getChangeInPercent().floatValue();
 
-                float price = quote.getPrice().floatValue();
-                float change = quote.getChange().floatValue();
-                float percentChange = quote.getChangeInPercent().floatValue();
+            // WARNING! Don't request historical data for a stock that doesn't exist!
+            // The request will hang forever X_x
+            List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
 
-                // WARNING! Don't request historical data for a stock that doesn't exist!
-                // The request will hang forever X_x
-                List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
+            StringBuilder historyBuilder = new StringBuilder();
 
-                StringBuilder historyBuilder = new StringBuilder();
-
-                for (HistoricalQuote it : history) {
-                    historyBuilder.append(it.getDate().getTimeInMillis());
-                    historyBuilder.append(", ");
-                    historyBuilder.append(it.getClose());
-                    historyBuilder.append("\n");
-                }
-
-                ContentValues quoteCV = new ContentValues();
-                quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
-                quoteCV.put(Contract.Quote.COLUMN_PRICE, price);
-                quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange);
-                quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change);
-
-
-                quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
-
-                quoteCVs.add(quoteCV);
-
+            for (HistoricalQuote it : history) {
+                historyBuilder.append(it.getDate().getTimeInMillis());
+                historyBuilder.append(", ");
+                historyBuilder.append(it.getClose());
+                historyBuilder.append("\n");
             }
+
+            ContentValues quoteCV = new ContentValues();
+            quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
+            quoteCV.put(Contract.Quote.COLUMN_PRICE, price);
+            quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange);
+            quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change);
+
+            quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
+
+            quoteCVs.add(quoteCV);
 
             context.getContentResolver()
                     .bulkInsert(
@@ -114,6 +111,8 @@ public final class QuoteSyncJob {
 
         } catch (IOException exception) {
             Timber.e(exception, "Error fetching stock quotes");
+        } catch (NoSuchElementException e) {
+            Timber.e(e, "Error fetching stock quotes");
         }
     }
 
@@ -127,7 +126,6 @@ public final class QuoteSyncJob {
         builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPeriodic(PERIOD)
                 .setBackoffCriteria(INITIAL_BACKOFF, JobInfo.BACKOFF_POLICY_EXPONENTIAL);
-
 
         JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
@@ -157,7 +155,6 @@ public final class QuoteSyncJob {
 
             builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .setBackoffCriteria(INITIAL_BACKOFF, JobInfo.BACKOFF_POLICY_EXPONENTIAL);
-
 
             JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
