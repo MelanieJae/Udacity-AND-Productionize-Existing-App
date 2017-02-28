@@ -17,7 +17,7 @@ YahooFinance
 
 This project and its base project are built using the Gradle build system.
 
-# The accessibility features added are as follows:
+The accessibility features added are as follows:
 
 Arabic language support(region: Egypt) for all screens and most text
 TalkBack support on all clickable items
