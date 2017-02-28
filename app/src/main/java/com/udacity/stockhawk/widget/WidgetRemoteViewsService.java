@@ -1,5 +1,6 @@
 package com.udacity.stockhawk.widget;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Binder;
@@ -9,6 +10,7 @@ import android.widget.RemoteViewsService;
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
+import com.udacity.stockhawk.ui.MainActivity;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -61,6 +63,10 @@ public class WidgetRemoteViewsService extends RemoteViewsService {
                 data.moveToPosition(position);
                 RemoteViews views = new RemoteViews(getApplicationContext().getPackageName(),
                         R.layout.widget_list_item);
+                // Create an Intent to launch MainActivity
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+                views.setOnClickPendingIntent(R.id.symbol, pendingIntent);
 
                 DecimalFormat dollarFormat = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
                 DecimalFormat dollarFormatWithPlus = (DecimalFormat) NumberFormat.getCurrencyInstance(Locale.US);
@@ -83,15 +89,9 @@ public class WidgetRemoteViewsService extends RemoteViewsService {
                     views.setTextViewText(R.id.price,
                             euroFormat.format(data.getFloat(Contract.Quote.POSITION_PRICE)));
                 }
-//
+
                 float rawAbsoluteChange = data.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
                 float percentageChange = data.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
-
-//                    if (rawAbsoluteChange > 0) {
-//                        views.setImageViewResource(R.id.change, R.drawable.percent_change_pill_green);
-//                    } else {
-//                        views.setImageViewResource(R.id.change, R.drawable.percent_change_pill_red);
-//                    }
 
                 String change = dollarFormatWithPlus.format(rawAbsoluteChange);
                 String percentage = percentageFormat.format(percentageChange / 100);
