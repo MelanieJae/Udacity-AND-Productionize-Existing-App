@@ -10,7 +10,7 @@ This app contains three screens and a widget that is accessible from the home an
 
 ## External Libraries:
 
-MPAndroidChart
+MPAndroidChart,
 YahooFinance
 
 ## Build System
