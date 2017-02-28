@@ -213,8 +213,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         switch (rightNow.get(Calendar.DAY_OF_WEEK)) {
             case Calendar.SATURDAY:
                 clock.setText(getString(R.string.us_markets_closed));
+                clock.setContentDescription(getString(R.string.us_markets_closed));
             case Calendar.SUNDAY:
                 clock.setText(getString(R.string.us_markets_closed));
+                clock.setContentDescription(getString(R.string.us_markets_closed));
             default:
                 displayCountdownTimer();
         }
@@ -225,12 +227,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         final int currTimeMinutes = rightNow.get(Calendar.MINUTE);
         final int currTimeSeconds = rightNow.get(Calendar.SECOND);
         final long currentTimeInMillis = ((currTimeHours * 60 * 60) + (currTimeMinutes * 60)
-                + currTimeSeconds)*1000;
+                + currTimeSeconds) * 1000;
         int GMTOffset = rightNow.get(Calendar.ZONE_OFFSET);
-
+        int DSTOffset = rightNow.get(Calendar.DST_OFFSET);
         // adjusted US market close based on 4PM EST(US) (9PM/21:00 GMT) converted to the user's
-        // time zone obtained from the system settings via the calendar 'rightnow' instance c
-        long adjUSMarketClose = (21*3600*1000 + GMTOffset);
+        // time zone obtained from the system settings via the calendar 'rightnow' instance
+        long adjUSMarketClose = (21 * 3600 * 1000 + GMTOffset + DSTOffset);
 
         millisInFuture = adjUSMarketClose - currentTimeInMillis;
         new CountDownTimer(millisInFuture, 1000) {
@@ -244,9 +246,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         + String.format(getString(R.string.format_hours), hours)
                         + ":" + String.format(getString(R.string.format_minutes), minutes)
                         + ":" + String.format(getString(R.string.format_seconds), seconds));
+                clock.setContentDescription(getString(R.string.closing_bell_countdown)
+                        + String.format(getString(R.string.format_hours), hours)
+                        + ":" + String.format(getString(R.string.format_minutes), minutes)
+                        + ":" + String.format(getString(R.string.format_seconds), seconds));
             }
+
             public void onFinish() {
                 clock.setText(getString(R.string.us_markets_closed));
+                clock.setContentDescription(getString(R.string.us_markets_closed));
+
             }
 
         }.start();

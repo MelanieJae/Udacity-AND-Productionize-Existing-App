@@ -45,9 +45,11 @@
     <string name="chart_description">Price History for: %s</string>
 
     <!-- content descriptions -->
+    <string name="add_a_new_stock_cd">Type in a new stock here</string>
     <string name="chart_cd">Line chart showing price history for: %s</string>
-    <string name="chart_heading_cd">Price History for: %s</string>
-    <string name="opening_detail_chart">Opening chart showing stock price history for: %s</string>
+    <string name="chart_heading_cd">Price History for this stock</string>
     <string name="widget_cd">Widget showing your favorite stocks and their prices</string>
-    
+    <string name="stock_list_item_cd">%s</string>
+    <string name="closing_bell_countdown_timer_cd">Countdown timer for closing of US Markets</string>
+
 </resources>

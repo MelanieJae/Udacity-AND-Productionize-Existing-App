@@ -37,7 +37,7 @@ import static com.udacity.stockhawk.R.id.chart;
  * Created by melanieh on 2/18/17.
  */
 
-public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String[] PRICE_TREND_COLUMNS = {Contract.Quote.COLUMN_HISTORY};
     private static final int CHART_DATA_LOADER_ID = 2;
@@ -59,11 +59,14 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         stockContentUri = getIntent().getData();
         stockSymbol = Contract.Quote.getStockFromUri(stockContentUri);
         Timber.d("stock symbol=" + stockSymbol);
+
         // the Utils class for MPAndroid chart must be initialized before attempting
         // to render the chart
         Utils.init(this);
-        TextView chartHeading = (TextView)findViewById(R.id.chart_heading);
+
+        TextView chartHeading = (TextView) findViewById(R.id.chart_heading);
         chartHeading.setText(String.format(getString(R.string.chart_description), stockSymbol));
+        lineChart.setContentDescription(String.format(getString(R.string.chart_cd), stockSymbol));
 
         // initialize loader
         getLoaderManager().initLoader(CHART_DATA_LOADER_ID, null, this);
@@ -119,8 +122,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             Timber.d("entry= " + entry);
             yAxis.add(entry);
         }
-        for (int i = 0; i < xAxis.size() - 1; i++) {
-        }
 
         // create new data set object for chart and add to the array of datasets
         // (in this case just one for the stock we clicked on)
@@ -138,7 +139,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
 
-                String dateMillisString = dateLabelMap.get((int)value);
+                String dateMillisString = dateLabelMap.get((int) value);
                 long dateInMillis = Long.parseLong(dateMillisString);
                 Date date = new Date(dateInMillis);
                 String dateString = DateFormat.getDateInstance().format(date);

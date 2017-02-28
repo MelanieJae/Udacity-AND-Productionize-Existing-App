@@ -68,7 +68,7 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
 
     @Override
     public void onBindViewHolder(StockViewHolder holder, int position) {
-        String symbol;
+        String symbolString;
         String price;
 
         cursor.moveToPosition(position);
@@ -96,11 +96,13 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
                 holder.change.setText(percentage);
             }
         } else {
-            symbol = cursor.getString(Contract.Quote.POSITION_SYMBOL);
+            symbolString = cursor.getString(Contract.Quote.POSITION_SYMBOL);
             price = cursor.getString(Contract.Quote.POSITION_SYMBOL);
 
-            holder.symbol.setText(symbol);
+            holder.symbol.setText(symbolString);
             holder.price.setText(euroFormat.format(cursor.getFloat(Contract.Quote.POSITION_PRICE)));
+            holder.symbol.setContentDescription
+                    (String.format(context.getString(R.string.stock_list_item_cd), symbolString));
 
             float rawAbsoluteChange = cursor.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
             float percentageChange = cursor.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
@@ -121,6 +123,7 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
                 holder.change.setText(percentage);
             }
         }
+
     }
 
     @Override
@@ -152,7 +155,6 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
-            itemView.setContentDescription(context.getString(R.string.opening_detail_chart));
         }
 
         @Override
