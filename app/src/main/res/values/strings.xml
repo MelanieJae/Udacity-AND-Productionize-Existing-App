@@ -22,7 +22,6 @@
 
     <string name="action_change_units">@string/pref_display_mode_key</string>
 
-
     <string name="dialog_title">Add Stock</string>
     <string name="dialog_hint">Symbol (e.g. GOOG)</string>
     <string name="dialog_cancel">Cancel</string>
@@ -44,16 +43,11 @@
 
     <!-- detail activity chart -->
     <string name="chart_description">Price History for: %s</string>
-    <!-- temp x axis labels: to be replaced by formatted string below -->
-    <string name="label_jan">Jan</string>
-    <string name="label_feb">Feb</string>
-    <string name="label_mar">Mar</string>
-    <string name="label_apr">Apr</string>
-    <string name="label_may">May</string>
-    <string name="label_jun">Jun</string>
 
-    <string name="format_x_axis_label"></string>
-
-    <string name="format_y_axis_label"></string>
-
+    <!-- content descriptions -->
+    <string name="chart_cd">Line chart showing price history for: %s</string>
+    <string name="chart_heading_cd">Price History for: %s</string>
+    <string name="opening_detail_chart">Opening chart showing stock price history for: %s</string>
+    <string name="widget_cd">Widget showing your favorite stocks and their prices</string>
+    
 </resources>

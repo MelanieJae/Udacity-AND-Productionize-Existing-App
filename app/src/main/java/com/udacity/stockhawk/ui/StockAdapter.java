@@ -68,6 +68,8 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
 
     @Override
     public void onBindViewHolder(StockViewHolder holder, int position) {
+        String symbol;
+        String price;
 
         cursor.moveToPosition(position);
 
@@ -94,7 +96,10 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
                 holder.change.setText(percentage);
             }
         } else {
-            holder.symbol.setText(cursor.getString(Contract.Quote.POSITION_SYMBOL));
+            symbol = cursor.getString(Contract.Quote.POSITION_SYMBOL);
+            price = cursor.getString(Contract.Quote.POSITION_SYMBOL);
+
+            holder.symbol.setText(symbol);
             holder.price.setText(euroFormat.format(cursor.getFloat(Contract.Quote.POSITION_PRICE)));
 
             float rawAbsoluteChange = cursor.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
@@ -116,7 +121,6 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
                 holder.change.setText(percentage);
             }
         }
-
     }
 
     @Override
@@ -148,10 +152,12 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
             super(itemView);
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
+            itemView.setContentDescription(context.getString(R.string.opening_detail_chart));
         }
 
         @Override
         public void onClick(View v) {
+
             int adapterPosition = getAdapterPosition();
             cursor.moveToPosition(adapterPosition);
             int symbolColumn = cursor.getColumnIndex(Contract.Quote.COLUMN_SYMBOL);

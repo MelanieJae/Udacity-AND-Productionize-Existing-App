@@ -108,24 +108,18 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         String[] dataPoints = rawDataString.split("\\n");
         for (int i = dataPoints.length - 1; i > 0; i--) {
             String[] dataPointSubArray = dataPoints[i].split(",");
-            Timber.d("dataPointSubArray size= " + dataPointSubArray.length);
-
             long dateInMillis = Long.parseLong(dataPointSubArray[0]);
-            Timber.d("dateInMillis= " + dateInMillis);
-
-            dateLabelMap.put(dataPoints.length - i, dataPointSubArray[0]);
-            Timber.d("dataPoints.length - i = " + (dataPoints.length - 1));
 
             float dateFloat = dateInMillis / 1.0e12f;
-            Timber.d("float date=" + dateFloat);
-
             float adjClosePrice = Float.parseFloat(dataPointSubArray[1]);
-            Timber.d("float adjClosePrice=" + adjClosePrice);
+            dateLabelMap.put((dataPoints.length - i), dataPointSubArray[0]);
 
             // add new data point to array list of custom data objects(Entries)
             Entry entry = new Entry(dateFloat, adjClosePrice);
             Timber.d("entry= " + entry);
             yAxis.add(entry);
+        }
+        for (int i = 0; i < xAxis.size() - 1; i++) {
         }
 
         // create new data set object for chart and add to the array of datasets
@@ -134,10 +128,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         // create a dataset and give it a type
 
-
         dataSets.add(set); // add the datasets
 
         // format xaxis labels
+
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setValueFormatter(new IAxisValueFormatter() {
 
@@ -151,7 +145,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
                 return dateString;
             }
-
         });
 
         // chart settings
@@ -171,5 +164,4 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
         lineChart.invalidate();
     }
-
 }
