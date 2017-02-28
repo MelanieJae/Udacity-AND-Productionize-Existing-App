@@ -2,7 +2,7 @@ The intent of this project is to incorporate fictional UX feedback from users to
 
 https://www.udacity.com/course/android-developer-nanodegree-by-google--nd801.
 
-App Notes
+# App Notes
 
 This app contains three screens and a widget that is accessible from the home and lock screens. The main screen shows a default list of stocks that can be added to by clicking the '+' button. That button opens a dialog (second screen) where the user's favorite stock symbol can be typed in and added to the list. Upon clicking on any of the stocks on the list you arrive at a third detail screen which shows a two-year-long graphical history of the price for the selected stock. The app also contains a widget which can be added in the usual manner from the home screen and is accessible from both the home and lock screens. Its size is customizable and it shows all of the stock information that can be found on the main screen of the app.
 
