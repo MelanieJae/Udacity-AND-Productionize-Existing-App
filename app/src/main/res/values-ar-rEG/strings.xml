@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="http://schemas.android.com/tools">
+
+    <!-- add stock dialog -->
     <string name="add_stock_dialog_edittext">Tاكتب في رمز الأسهم الجديدة لتعقب</string>
     <string name="app_name">الأسهم هوك</string>
     <string name="dialog_add">إضافة</string>
@@ -12,7 +14,12 @@
     <string name="error_no_stocks">
         وأضافت يوجد مخزون! اضغط على زر عمل العائمة لإضافة واحد.
     </string>
-    <string name="fab_main">إضافة الأسهم الجديدة</string>
+
+    <string name="invalid_symbol">
+        عذرا، هذا ليس رمزا الأسهم صالح.
+         يرجى اختيار رمز آخر.
+    </string>
+    <!-- main screen -->
     <string name="pref_stocks_key">مخازن</string>
     <string name="toast_no_connectivity">سيتم تحديث عندما الشبكة المتوفرة</string>
     <string name="toast_stock_added_no_connectivity">وأضاف رمز

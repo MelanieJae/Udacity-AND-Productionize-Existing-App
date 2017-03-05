@@ -18,7 +18,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="@dimen/activity_horizontal_margin"
-            android:paddingRight="@dimen/activity_horizontal_margin" />
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingEnd="@dimen/activity_horizontal_margin" />
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -26,14 +28,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/fab_layout_margin"
         android:onClick="button"
         android:src="@drawable/fab_plus"
         app:backgroundTint="@color/material_blue_500"
         app:borderWidth="0dp"
-        app:elevation="6dp"
+        app:elevation="@dimen/fab_elevation"
         app:fabSize="normal"
-        app:pressedTranslationZ="12dp" />
+        app:pressedTranslationZ="@dimen/fab_pressed_translation_z"
+        android:contentDescription="@string/fab_cd"/>
 
     <TextView
         android:id="@+id/error"
@@ -49,9 +52,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:textSize="26sp"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
-        />
+        android:textSize="@dimen/clock_tv_text_size"
+        android:layout_marginTop="@dimen/clock_tv_margin_top"
+        android:layout_marginLeft="@dimen/clock_tv_horiz_margin"
+        android:layout_marginStart="@dimen/clock_tv_horiz_margin" />
 </merge>

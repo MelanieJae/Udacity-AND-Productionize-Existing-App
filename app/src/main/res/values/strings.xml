@@ -12,6 +12,10 @@
     <string name="pref_display_mode_absolute_key">absolute</string>
     <string name="pref_display_mode_percentage_key">percentage</string>
 
+    <!-- add stock dialog -->
+    <string name="invalid_symbol">Sorry, this is not a valid stock symbol.
+        Please choose another symbol.</string>
+
     <!-- stock adapter -->
     <string name="default_stocks_yahoo">YHOO</string>
     <string name="default_stocks_apple">AAPL</string>
@@ -46,6 +50,7 @@
 
     <!-- content descriptions -->
     <string name="add_a_new_stock_cd">Type in a new stock here</string>
+    <string name="fab_cd">Press button to add a favorite stock</string>
     <string name="chart_cd">Line chart showing price history for: %s</string>
     <string name="chart_heading_cd">Price History for this stock</string>
     <string name="widget_cd">Widget showing your favorite stocks and their prices</string>

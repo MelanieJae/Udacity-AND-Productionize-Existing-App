@@ -5,7 +5,7 @@
     android:initialLayout="@layout/widget_list"
     android:minHeight="@dimen/widget_detail_default_height"
     android:minResizeHeight="@dimen/widget_detail_min_resize_height"
-    android:minResizeWidth="@dimen/widget_detail_min_resize_width"
+    android:minResizeWidth="250dp"
     android:minWidth="@dimen/widget_detail_default_width"
     android:previewImage="@drawable/ic_dollar"
     android:resizeMode="horizontal|vertical"

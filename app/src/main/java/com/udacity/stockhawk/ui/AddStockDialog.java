@@ -14,8 +14,12 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.udacity.stockhawk.R;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,16 +51,17 @@ public class AddStockDialog extends DialogFragment {
         builder.setView(custom);
 
         builder.setMessage(getString(R.string.dialog_title));
+
+        builder.setNegativeButton(getString(R.string.dialog_cancel), null);
         builder.setPositiveButton(getString(R.string.dialog_add),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         addStock();
+                        dismissAllowingStateLoss();
                     }
                 });
-        builder.setNegativeButton(getString(R.string.dialog_cancel), null);
 
-        Dialog dialog = builder.create();
-
+        AlertDialog dialog = builder.create();
         Window window = dialog.getWindow();
         if (window != null) {
             window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
@@ -68,12 +73,16 @@ public class AddStockDialog extends DialogFragment {
     private void addStock() {
         Activity parent = getActivity();
         String symbol = stock.getText().toString();
+        //regex for invalid stock symbol characters in user input
+        Pattern stockSymbolRegex = Pattern.compile("[0-9$&+,:;=?@#|'<>.-^*()%!]");
+        Matcher matcher = stockSymbolRegex.matcher(symbol);
 
-        if (parent instanceof MainActivity) {
-            ((MainActivity) parent).addStock(symbol);
+        if(matcher.find()) {
+            Toast.makeText(parent, "invalid symbol", Toast.LENGTH_LONG);
+        } else {
+            if (parent instanceof MainActivity) {
+                ((MainActivity) parent).addStock(symbol);
+            }
         }
-        dismissAllowingStateLoss();
     }
-
-
 }

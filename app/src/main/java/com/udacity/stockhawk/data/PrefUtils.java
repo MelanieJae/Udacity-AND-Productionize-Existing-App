@@ -1,54 +1,70 @@
 package com.udacity.stockhawk.data;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 
 import com.udacity.stockhawk.R;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 public final class PrefUtils {
 
+    static Uri stocksUri = Contract.Quote.URI;
+
     private PrefUtils() {
     }
 
     public static Set<String> getStocks(Context context) {
+        String[] DEFAULT_STOCKS_COLUMNS = new String[]{Contract.Quote.COLUMN_SYMBOL};
         String stocksKey = context.getString(R.string.pref_stocks_key);
         String initializedKey = context.getString(R.string.pref_stocks_initialized_key);
-        String[] defaultStocksList = context.getResources().getStringArray(R.array.default_stocks);
+        Set<String> defaultStocks = new HashSet<>();
 
-        HashSet<String> defaultStocks = new HashSet<>(Arrays.asList(defaultStocksList));
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
         boolean initialized = prefs.getBoolean(initializedKey, false);
 
         if (!initialized) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean(initializedKey, true);
-            editor.putStringSet(stocksKey, defaultStocks);
-            editor.apply();
-            return defaultStocks;
+            Cursor stocksCursor = context.getContentResolver().query(stocksUri,
+                    DEFAULT_STOCKS_COLUMNS, null, null, null);
+                while (stocksCursor.moveToNext()) {
+                    String symbol = stocksCursor.getString(Contract.Quote.POSITION_SYMBOL);
+                    defaultStocks.add(symbol);
+                }
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean(initializedKey, true);
+                editor.putStringSet(stocksKey, defaultStocks);
+                editor.apply();
         }
-        return prefs.getStringSet(stocksKey, new HashSet<String>());
-
+        return defaultStocks;
     }
 
     private static void editStockPref(Context context, String symbol, Boolean add) {
         String key = context.getString(R.string.pref_stocks_key);
-        Set<String> stocks = getStocks(context);
+        // editing the default stocks will be done via the database rather than directly
+        // to the stringset
+        Set<String> stocks;
+        ContentValues values;
+        values = new ContentValues();
+        values.put(Contract.Quote.COLUMN_SYMBOL, symbol);
 
-            if (add) {
-                stocks.add(symbol);
-            } else {
-                stocks.remove(symbol);
-            }
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
 
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            SharedPreferences.Editor editor = prefs.edit();
+        if (add) {
+            context.getContentResolver().insert(stocksUri, values);
+            stocks = getStocks(context);
             editor.putStringSet(key, stocks);
+        } else {
+            context.getContentResolver().
+                    delete(Contract.Quote.makeUriForStock(symbol), null, null);
+            stocks = getStocks(context);
+            editor.putStringSet(key, stocks);
+        }
             editor.apply();
     }
 
@@ -58,6 +74,8 @@ public final class PrefUtils {
 
     public static void removeStock(Context context, String symbol) {
         editStockPref(context, symbol, false);
+        Uri stockUri = Contract.Quote.makeUriForStock(symbol);
+        context.getContentResolver().delete(stockUri, null, null);
     }
 
     public static String getDisplayMode(Context context) {
