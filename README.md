@@ -19,8 +19,7 @@ This project and its base project are built using the Gradle build system.
 
 ## The accessibility features added are as follows:
 
-Arabic language support(region: Egypt) for all screens and most text
-TalkBack support on all clickable items
-Widget that can be added showing all of the user's favorite stocks and all information for those stocks that is available on the main activity screen
+1. Arabic language support(region: Egypt) for all screens and TalkBack support on all clickable items
+2. Widget that can be added showing all of the user's favorite stocks and all information for those stocks that is available on the main activity screen
 
 
